@@ -1,0 +1,13 @@
+{
+    "name": "jdarwind/portable-configuration-manager",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Jdarwind\\PortableConfigurationManager\\": "src/"
+        }
+    },
+    "require": {
+        "ext-simplexml": "*",
+        "ext-libxml": "*"
+    }
+}

@@ -3,3 +3,9 @@ Docs/*
 phpDocumentor.phar
 vendor/*
 .idea/*
+Tests/*
+composer.lock
+phpunit.xml
+.phpunit.cache/*
+data.php
+main.php

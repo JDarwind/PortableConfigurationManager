@@ -40,6 +40,24 @@ class Manager extends AbstractManager
 
     public function serialize(array $params = [])
     {
-        // TODO: Implement serialize() method.
+        $_data = [
+            'fileName' => ""
+        ];
+        //parsing Params Array
+        foreach ($params as $key => $value) {
+            switch($key){
+                case 'fileName':
+                        $_data['fileName'] = $value;
+                    break;
+            }
+        }
+        $configArray = $this->ConfigurationStorage->get();
+        //Serializing on file
+        if($_data['fileName'] && is_string($_data['fileName'])){
+            $fileContent = sprintf('<?php \n return %s \n ?>',var_export( $configArray, true ) );
+            file_put_contents( $_data['fileName'], $fileContent);
+            return;
+        }
+        return $configArray;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Jdarwind\PortableConfigurationManager;
 
-class AbstractManager {
+abstract class AbstractManager implements ManagerInterface {
     protected ConfigurationObject|null $ConfigurationStorage = null;
     protected string $arraySeparatorChar = '.';
     protected array $configurations = [];

@@ -37,4 +37,9 @@ class Manager extends AbstractManager
         $this->ConfigurationStorage = $this->buildConfigurationObject();
         return $this;
     }
+
+    public function serialize(array $params = [])
+    {
+        // TODO: Implement serialize() method.
+    }
 }

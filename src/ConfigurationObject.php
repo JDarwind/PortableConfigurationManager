@@ -7,10 +7,12 @@ class ConfigurationObject
     protected string $arraySeparatorChar = '.';
     protected array $configurations = [];
     protected bool $throwErrors;
+    protected array $errors = [];
 
     public function __construct(array $configurations = [], string $arraySeparatorChar = ".", bool $throwErrors = false ) {
         $this->configurations = $configurations;
         $this->arraySeparatorChar = $arraySeparatorChar;
+        $this->throwErrors = $throwErrors;
     }
 
 
@@ -36,6 +38,18 @@ class ConfigurationObject
         }
         return null;
     }
+    public function getErrors(){
+        return $this->errors;
+    }
+    public function resetErrors(){
+        $this->errors = [];
+        return $this;
+    }
+
+    public function useErrors(bool $useErrors){
+        $this->throwErrors = $useErrors;
+        return $this;
+    }
 
     /**
      * @throws \Throwable
@@ -54,33 +68,38 @@ class ConfigurationObject
             $this->errors[] = $e;
         }
     }
-    protected function recursive_set(&$arr, $path, $data){
-        if(array_key_exists($path[0], $arr)){
+    function recursive_set(&$arr, $path, $data, $lastkey = null){
+        if(is_array($arr) && array_key_exists($path[0], $arr)){
             foreach($arr as $key => &$value){
-                if($path[0] ==$key){
+                if($path[0] == $key){
                     if(is_array($value)){
+                        $lastKey =$path[array_key_first($path)];
                         array_shift($path);
-                        return $this->recursive_set($value, $path, $data);
+                        return $this->recursive_set($value, $path, $data, $lastKey);
                     }else{
-                        $value = $data ;
+                        $value = $data;
                         return  $value;
                     }
                 }
             }
         }else{
+
             if(is_array($path)){
+
                 if(count($path) > 1){
+                    $lastKey = $path[array_key_first($path)];
                     $arr[$path[0]] = [];
                     array_shift($path);
-                    return $this->recursive_set($arr, $path, $data);
+                    return $this->recursive_set($arr[$lastKey], $path, $data);
                 }
                 else{
                     $arr[$path[0]] = $data;
+                    return $arr[$path[0]];
                 }
             }else{
                 $arr[$path] = $data;
+                return $arr[$path[0]];
             }
-
         }
 
     }

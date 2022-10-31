@@ -3,7 +3,7 @@ Simple but powerful configuration managment library written in php
 
 ## Disclaimer
 This is an alpha version of the library.
-I do not take any responsibility for damages to persons and third party cores deriving from the use of this library
+I do not take any responsibility for damages to persons and third party things deriving from the use of this library
 
 ## Features
 

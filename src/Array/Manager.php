@@ -53,10 +53,10 @@ class Manager extends AbstractManager
         }
         $configArray = $this->ConfigurationStorage->get();
         //Serializing on file
-        if($_data['fileName'] && is_string($_data['fileName'])){
+        if(isset($_data['fileName']) && is_string($_data['fileName']) && $_data['fileName'] ){
             $fileContent = sprintf('<?php \n return %s \n ?>',var_export( $configArray, true ) );
             file_put_contents( $_data['fileName'], $fileContent);
-            return;
+            return $configArray;
         }
         return $configArray;
     }

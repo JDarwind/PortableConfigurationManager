@@ -12,7 +12,9 @@ class Manager extends AbstractManager{
      * @throws ConfigurationFileNotSupportedException
      */
     public function load(string $filePath){
+        $filePath = __DIR__ . '/' . $filePath;
         if(!\file_exists($filePath)){
+
             throw new ConfigurationFileNotFoundException($filePath);
         }
         \libxml_use_internal_errors(true);
@@ -31,8 +33,38 @@ class Manager extends AbstractManager{
         return $this;
     }
 
-    public function serialize(array $params = [])
+    public function serialize(array $params = []):string
     {
-        // TODO: Implement serialize() method.
+        $_data = [
+            'fileName' => ""
+        ];
+        //parsing Params Array
+        foreach ($params as $key => $value) {
+            switch($key){
+                case 'fileName':
+                    $_data['fileName'] = $value;
+                    break;
+            }
+        }
+        $configArray = $this->ConfigurationStorage->get();
+
+        $xmlObj = new \SimpleXMLElement('<configurations></configurations>');
+        ArraySerializer::convert($xmlObj, $configArray);
+        $dom = new \DOMDocument("1.0");
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xmlObj->asXML());
+        $fileContent =  $dom->saveXML();
+        $fileContent =  preg_replace_callback('/^( +)</m', function($a) {
+            return str_repeat(' ',intval(strlen($a[1]) / 2) * 4).'<';
+        }, $fileContent);
+        $fileContent = preg_replace('/[\n]/',PHP_EOL,$fileContent);
+        //Serializing on file
+        if(isset($_data['fileName']) && is_string($_data['fileName']) && $_data['fileName'] ){
+            $filePath = __DIR__ . '/' . $_data['fileName'];
+            file_put_contents( $filePath, $fileContent);
+            return $fileContent;
+        }
+        return $fileContent;
     }
 }

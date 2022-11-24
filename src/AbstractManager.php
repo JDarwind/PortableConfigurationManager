@@ -2,16 +2,16 @@
 
 namespace Jdarwind\PortableConfigurationManager;
 
+use Jdarwind\PortableConfigurationManager\Exception\ConfigurationFileNotFoundException;
+
 abstract class AbstractManager implements ManagerInterface {
     protected ConfigurationObject|null $ConfigurationStorage = null;
     protected string $arraySeparatorChar = '.';
-    protected array $configurations = [];
-    protected bool $throwErrors = false;
+    public array $configurations = [];
+    protected bool $throwErrors = true;
     protected array $errors = [];
 
-    const ACCESS_LEVEL_PUBLIC = 0, ACCESS_LEVEL_RESTRICTED = 1;
-
-    public function __construct(bool $throwErrors = false, string $arraySeparatorChar = '.'){
+    public function __construct(bool $throwErrors = true, string $arraySeparatorChar = '.'){
         $this->throwErrors = $throwErrors;
         $this->arraySeparatorChar = $arraySeparatorChar;
     }
@@ -38,6 +38,21 @@ abstract class AbstractManager implements ManagerInterface {
             return $this;
         }
 
+    }
+    public function getPath(string $filePath)
+    {
+        $file = false;
+        if(realpath($filePath)){
+            $file = realpath($filePath);
+        }else{
+            $backtrace = \debug_backtrace()[1]['file'];
+            $file =  realpath(dirname($backtrace)). DIRECTORY_SEPARATOR . $filePath;
+        }
+
+        if (!$file || !\file_exists($file)) {
+            throw new ConfigurationFileNotFoundException($file);
+        }
+        return $file;
     }
 
 }

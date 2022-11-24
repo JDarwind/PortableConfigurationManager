@@ -7,18 +7,23 @@ use Jdarwind\PortableConfigurationManager\Exception\ConfigurationFileNotSupporte
 
 class Manager extends AbstractManager{
 
+    public function __construct(bool $throwErrors = true, string $arraySeparatorChar = '.')
+    {
+        parent::__construct($throwErrors, $arraySeparatorChar);
+    }
+
     /**
      * @throws ConfigurationFileNotFoundException
      * @throws ConfigurationFileNotSupportedException
      */
     public function load(string $filePath){
-        $filePath = __DIR__ . '/' . $filePath;
-        if(!\file_exists($filePath)){
 
-            throw new ConfigurationFileNotFoundException($filePath);
-        }
-        \libxml_use_internal_errors(true);
-        $xmlData = \simplexml_load_file($filePath);
+        $filePath = $this->getPath($filePath);
+
+        \libxml_use_internal_errors(false);
+        $buffer = file_get_contents($filePath);
+
+        $xmlData = \simplexml_load_string($buffer);
         if($xmlData == false){
             throw new ConfigurationFileNotSupportedException($filePath);
         }
@@ -42,7 +47,7 @@ class Manager extends AbstractManager{
         foreach ($params as $key => $value) {
             switch($key){
                 case 'fileName':
-                    $_data['fileName'] = $value;
+                    $_data['fileName'] = $this->getPath($value);;
                     break;
             }
         }
@@ -50,6 +55,7 @@ class Manager extends AbstractManager{
 
         $xmlObj = new \SimpleXMLElement('<configurations></configurations>');
         ArraySerializer::convert($xmlObj, $configArray);
+
         $dom = new \DOMDocument("1.0");
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
@@ -61,8 +67,7 @@ class Manager extends AbstractManager{
         $fileContent = preg_replace('/[\n]/',PHP_EOL,$fileContent);
         //Serializing on file
         if(isset($_data['fileName']) && is_string($_data['fileName']) && $_data['fileName'] ){
-            $filePath = __DIR__ . '/' . $_data['fileName'];
-            file_put_contents( $filePath, $fileContent);
+            file_put_contents( $_data['fileName'], $fileContent);
             return $fileContent;
         }
         return $fileContent;

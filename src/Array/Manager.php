@@ -8,6 +8,10 @@ use Jdarwind\PortableConfigurationManager\Exception\ConfigurationFileNotSupporte
 
 class Manager extends AbstractManager
 {
+    public function __construct(bool $throwErrors = true, string $arraySeparatorChar = '.')
+    {
+        parent::__construct($throwErrors, $arraySeparatorChar);
+    }
 
     /**
      * @throws ConfigurationFileNotFoundException
@@ -15,11 +19,10 @@ class Manager extends AbstractManager
      */
     public function load(string $filePath)
     {
-        try {
-            if (!\file_exists($filePath)) {
-                throw new ConfigurationFileNotFoundException($filePath);
-            }
 
+
+        try {
+            $filePath = $this->getPath($filePath);
             $data = include $filePath;
 
             if (!is_array($data)) {
@@ -47,10 +50,11 @@ class Manager extends AbstractManager
         foreach ($params as $key => $value) {
             switch($key){
                 case 'fileName':
-                        $_data['fileName'] = $value;
+                        $_data['fileName'] =  $this->getPath($value);
                     break;
             }
         }
+
         $configArray = $this->ConfigurationStorage->get();
         //Serializing on file
         if(isset($_data['fileName']) && is_string($_data['fileName']) && $_data['fileName'] ){

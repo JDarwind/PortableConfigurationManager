@@ -2,7 +2,7 @@
 
 namespace Jdarwind\PortableConfigurationManager\Array\Immutable;
 
-use Jdarwind\PortableConfigurationManager\AbstractManager;
+use Jdarwind\PortableConfigurationManager\Array\AbstractManager;
 use Jdarwind\PortableConfigurationManager\Exception\ConfigurationFileNotFoundException;
 use Jdarwind\PortableConfigurationManager\Exception\ConfigurationFileNotSupportedException;
 use Jdarwind\PortableConfigurationManager\Exception\ImmutableDataChangeNotAllowedException;
@@ -22,24 +22,7 @@ class Manager extends AbstractManager
      */
     public function load(string $filePath)
     {
-        try {
-            $filePath = $this->getPath($filePath);
-            $data = include $filePath;
-
-            if (!is_array($data)) {
-                throw new ConfigurationFileNotSupportedException($filePath);
-            }
-            foreach ($data as $key => $value) {
-                $this->configurations[$key] = $value;
-            }
-        } catch (\Exception|\Throwable $e){
-            if($this->throwErrors){
-                throw $e;
-            }
-            $this->errors[] = $e;
-        }
-        $this->ConfigurationStorage = $this->buildConfigurationObject();
-        return $this;
+        return parent::_load($filePath);
     }
 
     /**

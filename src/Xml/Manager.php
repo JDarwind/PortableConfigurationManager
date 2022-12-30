@@ -1,7 +1,7 @@
 <?php
 namespace Jdarwind\PortableConfigurationManager\Xml;
 
-use Jdarwind\PortableConfigurationManager\AbstractManager;
+use Jdarwind\PortableConfigurationManager\Xml\AbstractManager;
 use Jdarwind\PortableConfigurationManager\Exception\ConfigurationFileNotFoundException;
 use Jdarwind\PortableConfigurationManager\Exception\ConfigurationFileNotSupportedException;
 
@@ -15,27 +15,11 @@ class Manager extends AbstractManager{
     /**
      * @throws ConfigurationFileNotFoundException
      * @throws ConfigurationFileNotSupportedException
+     * @throws \Throwable
      */
     public function load(string $filePath){
 
-        $filePath = $this->getPath($filePath);
-
-        \libxml_use_internal_errors(false);
-        $buffer = file_get_contents($filePath);
-
-        $xmlData = \simplexml_load_string($buffer);
-        if($xmlData == false){
-            throw new ConfigurationFileNotSupportedException($filePath);
-        }
-
-        $tmp = json_decode(json_encode($xmlData),true);
-
-        if(!json_last_error() == JSON_ERROR_NONE){
-            throw new ConfigurationFileNotSupportedException($filePath);
-        } 
-        $this->configurations = $tmp;
-        $this->ConfigurationStorage = $this->buildConfigurationObject();
-        return $this;
+        return parent::_load($filePath);
     }
 
     public function serialize(array $params = []):string
